@@ -73,6 +73,26 @@ print("CHAN 3 (For example VMCU): "+"\t{:>5.3f}".format(chan3.voltage))
 time.sleep(1)
 print("CHAN 4 (For example V_SW): "+"\t{:>5.3f}".format(chan4.voltage))
 time.sleep(1)
+if(chan1.voltage < 4.9 or chan1.voltage > 4.9):
+    print("Channel 1 ADC check failed. 5V is coming as {:>5.3f}".format(chan1.voltage))
+    ch1='F'
+if(chan2.voltage < 3.25 or chan2.voltage > 3.4):
+    print("Channel 2 ADC check failed. 3V3 is coming as {:>5.3f}".format(chan2.voltage))
+    ch2='F'
+if(chan3.voltage < 3.25 or chan3.voltage > 3.4):
+    print("Channel 3 ADC check failed. VMCU is coming as {:>5.3f}".format(chan3.voltage))
+    ch3='F'
+if(chan4.voltage < 3.55 or chan4.voltage > 3.65):
+    print("Channel 4 ADC check failed. VMCU is coming as {:>5.3f}".format(chan4.voltage))
+    ch4='F'
+print("Program 2 ended")
+if (ch1 =='F' or ch2=='F' or ch3=='F' or ch4=='F'):
+    print("Impedance check failed")
+    quit()
+elif (ch1 =='T' or ch2=='T' or ch3=='T' or ch4=='T'):
+    print("Impedance check passed")
+else:
+    print("Program failed")
 print("Test completed")
 GPIO.output(in1, True)#relay OFF
 print("Board turned OFF")
