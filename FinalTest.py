@@ -3,7 +3,7 @@ import RPi.GPIO as GPIO
 import time
 from csv import writer
 rm = pyvisa.ResourceManager()
-dmm = rm.open_resource('TCPIP0::10.207.4.80::inst0::INSTR')
+dmm = rm.open_resource('TCPIP0::10.207.4.136::inst0::INSTR')
 in1 = 22 #Power Relay to STK
 in2 = 15 #Relay 1
 in3 = 16 #Relay 2
@@ -43,20 +43,26 @@ def voltFailUp(value, lim, TP):
 		vol ='Fail'	
 
 def impCheck(inCh,TP):
-	time.sleep(1)
+	dmm.write(':*RST')
+	time.sleep(3)
+	dmm.write(':SENS:FUNC "RES"') 
 	GPIO.setup(inCh, GPIO.OUT) #GPIO initialise as output
 	GPIO.output(inCh, False) #Connect TPx to DMM
-	for i in range(10):
-		val = float(dmm.query(':READ?'))-22600
-		time.sleep(0.5)
+	time.sleep(3)
+	
+	dmm.write('*OPC')
+	dmm.write('*CLS')
+	for i in range(300):
+		val = float(dmm.query(':READ?'))-5000
+		time.sleep(0.05)
 	shortCheck(val, TP)
 	print("Resistance at",TP,"is :"+ str(float("{:.2f}".format(val))) + " ohms")
 	time.sleep(1)
 	GPIO.output(inCh, True) #Disconnect TPx from DMM
 		
 GPIO.setmode(GPIO.BOARD) #Setting mode of GPIO
-dmm.write(':SENS:FUNC "RES"') #Set DMM to measure resistance
-GPIO.setup(in1, GPIO.OUT) #GPIO for STK power relay initialise as output
+#dmm.write(':SENS:FUNC "RES"') #Set DMM to measure resistance
+
 
 impCheck(in2,"TP1")
 impCheck(in3,"TP2")
@@ -74,6 +80,7 @@ impCheck(in4,"TP11")
 
 dmm.write(':SENS:FUNC "VOLT"')
 time.sleep(0.5)
+GPIO.setup(in1, GPIO.OUT) #GPIO for STK power relay initialise as output
 input("Connect TP1, TP2 and TP3 ")
 GPIO.output(in1, False) #Turn on STK
 
