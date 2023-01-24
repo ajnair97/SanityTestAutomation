@@ -36,6 +36,12 @@ def voltFail(value, lim, TP):
 		global vol
 		vol ='Fail'		
 
+def voltFailUp(value, lim, TP):
+	if value > lim:
+		print("Voltage test failed at",TP)
+		global vol
+		vol ='Fail'	
+
 def impCheck(inCh,TP):
 	time.sleep(1)
 	GPIO.setup(inCh, GPIO.OUT) #GPIO initialise as output
@@ -60,14 +66,15 @@ impCheck(in2,"TP4")
 impCheck(in3,"TP5")
 impCheck(in4,"TP6")
 input("Insert next 3 testpoints and press enter...")
-impCheck(in2,"TP7")
-impCheck(in3,"TP8")
-impCheck(in4,"TP9")
-input("Insert next 3 testpoints and press enter...")
-impCheck(in2,"TP10")
+impCheck(in2,"TP9")
+impCheck(in3,"TP10")
+impCheck(in4,"TP11")
+#input("Insert next 3 testpoints and press enter...")
+#impCheck(in2,"TP10")
 
 dmm.write(':SENS:FUNC "VOLT"')
 time.sleep(0.5)
+input("Connect TP1, TP2 and TP3 ")
 GPIO.output(in1, False) #Turn on STK
 
 def voltCheck(inCh, TP, lim):
@@ -81,28 +88,38 @@ def voltCheck(inCh, TP, lim):
 	GPIO.output(inCh, True) #Disconnect TPx from DMM
 	time.sleep(0.5)
 	
+def voltCheckUp(inCh, TP, lim):
+	time.sleep(0.5)
+	GPIO.output(inCh, False) #Connect TPx to DMM
+	for i in range(10):
+		val = float(dmm.query(':READ?'))
+		time.sleep(0.5)
+	print("Voltage at",TP,"is :"+ str(float("{:.3f}".format(val))) + " volts")
+	voltFailUp(val, lim, TP)
+	GPIO.output(inCh, True) #Disconnect TPx from DMM
+	time.sleep(0.5)
+
+input("Connect TP1, TP2 and TP3 ")
 voltCheck(in2, "TP1", 3.2)
-voltCheck(in2, "TP1", 3.4)
+voltCheckUp(in2, "TP1", 3.4)
 voltCheck(in3, "TP2", 3.2)
-voltCheck(in3, "TP2", 3.4)
+voltCheckUp(in3, "TP2", 3.4)
 voltCheck(in4, "TP3", 3.2)
-voltCheck(in4, "TP3", 3.4)
+voltCheckUp(in4, "TP3", 3.4)
 input("Insert next 3 testpoints and press enter...")
 voltCheck(in2, "TP4", 4.9)
-voltCheck(in2, "TP4", 5.1)
+voltCheckUp(in2, "TP4", 5.1)
 voltCheck(in3, "TP5", 3.2)
-voltCheck(in3, "TP5", 3.4)
+voltCheckUp(in3, "TP5", 3.4)
 voltCheck(in4, "TP6", 3.5)
-voltCheck(in4, "TP6", 3.7)
+voltCheckUp(in4, "TP6", 3.7)
 input("Insert next 3 testpoints and press enter...")
-voltCheck(in2, "TP7", 0)
-voltCheck(in3, "TP8", 4.9)
-voltCheck(in3, "TP8", 5.1)
-voltCheck(in4, "TP9", 3.2)
-voltCheck(in4, "TP9", 3.4)
-input("Insert next 3 testpoints and press enter...")
-voltCheck(in4, "TP9", 4.9)
-voltCheck(in4, "TP9", 5.1)
+voltCheck(in2, "TP9", 2.15)
+voltCheckUp(in2, "TP9", 2.35)
+voltCheck(in3, "TP10", 1.7)
+voltCheckUp(in3, "TP10", 1.9)
+voltCheck(in4, "TP11", 3.2)
+voltCheckUp(in4, "TP11", 3.4)
 
 if vol=='Fail':
 	data = [brdID, slNo, 'Pass', 'Fail']
