@@ -99,7 +99,7 @@ def voltCheckUp(inCh, TP, lim):
 	GPIO.output(inCh, True) #Disconnect TPx from DMM
 	time.sleep(0.5)
 
-input("Connect TP1, TP2 and TP3 ")
+#input("Connect TP1, TP2 and TP3 ")
 voltCheck(in2, "TP1", 3.2)
 voltCheckUp(in2, "TP1", 3.4)
 voltCheck(in3, "TP2", 3.2)
